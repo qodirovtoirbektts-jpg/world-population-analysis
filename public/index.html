@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunyo Aholisi 2026 & Demografik Tahlil (World Population Analytics)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f19',
+                        cardBg: '#131b2e',
+                        borderCol: '#1e293b',
+                        brandGreen: '#10b981',
+                        brandBlue: '#3b82f6',
+                        brandPurple: '#8b5cf6'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .gradient-title {
+            background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            transition: all 0.25s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- NAVIGATION HEADER -->
+    <header class="border-b border-borderCol/60 bg-darkBg/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-gradient-to-tr from-emerald-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
+                    <i data-lucide="globe-2" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight gradient-title">Dunyo Aholisi & Demografiya</h1>
+                        <span class="px-2 py-0.5 text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">2026 LIVE</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">1970 - 2026 Aholi o'sishi, zichlik va demografik tahlil platformasi</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="https://github.com/qodirovtoirbektts-jpg/world-population-analysis" target="_blank" class="flex items-center space-x-2 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    <i data-lucide="github" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">GitHub</span>
+                </a>
+                <button onclick="downloadCSV()" class="flex items-center space-x-2 text-xs font-semibold px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Eksport CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- KPI SUMMARY CARDS -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">2026 Jami Aholi</span>
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">8.18 mlrd</div>
+                <div class="text-xs text-emerald-400 mt-1 flex items-center font-semibold">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> +122% (1970-dan)
+                </div>
+            </div>
+
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">#1 Yetakchi Davlat</span>
+                    <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">Hindiston</div>
+                <div class="text-xs text-amber-400 mt-1 font-semibold">1.44 mlrd (17.6%)</div>
+            </div>
+
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">#2 Yirik Davlat</span>
+                    <i data-lucide="building" class="w-4 h-4 text-blue-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">Xitoy</div>
+                <div class="text-xs text-blue-400 mt-1 font-semibold">1.42 mlrd (17.3%)</div>
+            </div>
+
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">🇺🇿 O'zbekiston</span>
+                    <i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">37.55 mln</div>
+                <div class="text-xs text-cyan-400 mt-1 font-semibold">#42-o'rin • +1.58%/yil</div>
+            </div>
+
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">Eng Yuqori Zichlik</span>
+                    <i data-lucide="maximize" class="w-4 h-4 text-rose-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">Makao</div>
+                <div class="text-xs text-rose-400 mt-1 font-semibold">23,172 kishi/km²</div>
+            </div>
+
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">O'rtacha O'sish</span>
+                    <i data-lucide="activity" class="w-4 h-4 text-purple-400"></i>
+                </div>
+                <div class="text-2xl font-extrabold text-white">+0.97%</div>
+                <div class="text-xs text-purple-400 mt-1 font-semibold">Yillik global sur'at</div>
+            </div>
+        </section>
+
+        <!-- CONTROLS & FILTER BAR -->
+        <section class="glass-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto" id="continentFilterBtns">
+                <button onclick="filterContinent('All')" class="tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Barchasi (234)</button>
+                <button onclick="filterContinent('Asia')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Osiyo</button>
+                <button onclick="filterContinent('Europe')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Yevropa</button>
+                <button onclick="filterContinent('Africa')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Afrika</button>
+                <button onclick="filterContinent('North America')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Shimoliy Amerika</button>
+                <button onclick="filterContinent('South America')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Janubiy Amerika</button>
+                <button onclick="filterContinent('Oceania')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Okeaniya</button>
+            </div>
+            <div class="relative w-full md:w-72">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                <input id="searchInput" oninput="handleSearch()" type="text" placeholder="Davlatni qidirish..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500">
+            </div>
+        </section>
+
+        <!-- MAIN NAVIGATION TABS -->
+        <nav class="flex border-b border-borderCol space-x-2 overflow-x-auto pb-2">
+            <button onclick="switchTab('mapTab')" id="btn-mapTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-600 flex items-center space-x-2 shrink-0">
+                <i data-lucide="map" class="w-4 h-4"></i>
+                <span>Global Xarita</span>
+            </button>
+            <button onclick="switchTab('densityTab')" id="btn-densityTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 flex items-center space-x-2 shrink-0">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                <span>Aholi Zichligi</span>
+            </button>
+            <button onclick="switchTab('growthTab')" id="btn-growthTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 flex items-center space-x-2 shrink-0">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                <span>O'sish Sur'atlari</span>
+            </button>
+            <button onclick="switchTab('demoTab')" id="btn-demoTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 flex items-center space-x-2 shrink-0">
+                <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+                <span>Demografiya (Tug'ilish & Umr)</span>
+            </button>
+            <button onclick="switchTab('compareTab')" id="btn-compareTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 flex items-center space-x-2 shrink-0">
+                <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                <span>Davlatlarni Taqqoslash (1970-2026)</span>
+            </button>
+            <button onclick="switchTab('dataTab')" id="btn-dataTab" class="nav-tab px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 flex items-center space-x-2 shrink-0">
+                <i data-lucide="database" class="w-4 h-4"></i>
+                <span>Ma'lumotlar Jadvali</span>
+            </button>
+        </nav>
+
+        <!-- TAB 1: GLOBAL MAP -->
+        <section id="mapTab" class="tab-content space-y-6">
+            <div class="glass-card p-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b border-borderCol/50 gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <span>Interaktiv Dunyo Xaritasi (Plotly Choropleth)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Davlatlar ustiga sichqonchani olib borib, batafsil demografik ko'rsatkichlarni ko'ring</p>
+                    </div>
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <select id="mapMetricSelect" onchange="renderChoropleth()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-2 text-white">
+                            <option value="2026 Population">👥 2026 Aholi soni</option>
+                            <option value="2026 Density (per km²)">🏙️ Aholi zichligi (kishi/km²)</option>
+                            <option value="2026 Annual Growth %">📈 Yillik o'sish sur'ati (%)</option>
+                            <option value="Fertility Rate">👶 Tug'ilish koeffitsienti (TFR)</option>
+                            <option value="Life Expectancy">🩺 O'rtacha umr ko'rish (yil)</option>
+                            <option value="Median Age">🎂 O'rtacha yosh (yil)</option>
+                            <option value="2026 World Population Percentage">🌐 Dunyo ulushi (%)</option>
+                        </select>
+                        <select id="mapProjSelect" onchange="renderChoropleth()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-2 text-white">
+                            <option value="natural earth">🗺️ Tekis xarita</option>
+                            <option value="orthographic">🌐 3D Globus</option>
+                            <option value="mercator">📐 Merkatr</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="choroplethChart" style="height: 560px;" class="w-full"></div>
+            </div>
+
+            <!-- CONTINENT SUMMARY CHARTS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6">
+                    <h3 class="text-base font-bold text-white mb-2">Qit'alar bo'yicha aholi ulushi (2026)</h3>
+                    <div id="continentPieChart" style="height: 340px;"></div>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="text-base font-bold text-white mb-2">Qit'alar bo'yicha o'rtacha yillik o'sish sur'ati</h3>
+                    <div id="continentGrowthChart" style="height: 340px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: DENSITY -->
+        <section id="densityTab" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-card p-6">
+                    <h3 class="text-base font-bold text-white mb-2">Aholi zichligi eng yuqori TOP-15 hudud (kishi/km²)</h3>
+                    <div id="topDensityChart" style="height: 440px;"></div>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="text-base font-bold text-white mb-2">Aholi zichligi eng past (eng siyrak) TOP-15 davlat</h3>
+                    <div id="lowDensityChart" style="height: 440px;"></div>
+                </div>
+            </div>
+            <div class="glass-card p-6">
+                <h3 class="text-base font-bold text-white mb-1">Maydon va Zichlik o'rtasidagi bog'liqlik (Log-shkala)</h3>
+                <p class="text-xs text-slate-400 mb-4">Aylanalar hajmi davlatning 2026-yildagi aholi soniga mutanosib</p>
+                <div id="densityAreaScatter" style="height: 460px;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GROWTH -->
+        <section id="growthTab" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6">
+                <h3 class="text-base font-bold text-white mb-1">2026 Yillik Aholi O'sish Sur'atlari: Tez Ko'payuvchi vs Kamayuvchi Davlatlar</h3>
+                <p class="text-xs text-slate-400 mb-4">Yashil — o'sish (>0%), Qizil — depopulyatsiya (<0%)</p>
+                <div id="growthRateChart" style="height: 500px;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 4: DEMOGRAPHY -->
+        <section id="demoTab" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6">
+                <h3 class="text-base font-bold text-white mb-1">Tug'ilish Koeffitsienti (TFR) va O'rtacha Umr Ko'rish Bog'liqligi</h3>
+                <p class="text-xs text-slate-400 mb-4">Qizil uzuq chiziq: aholi almashinuv me'yori (2.1 bola/ayol)</p>
+                <div id="demoScatterChart" style="height: 520px;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 5: COMPARATOR -->
+        <section id="compareTab" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Davlatlarni Solishtirish (1970 - 2026 Tarixiy Dinamikasi)</h3>
+                        <p class="text-xs text-slate-400">Solishtirish uchun quyidagi davlatlardan tanlang:</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs text-slate-300 flex items-center space-x-1 cursor-pointer">
+                            <input id="logScaleToggle" onchange="renderComparisonTimeline()" type="checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-600">
+                            <span>Logarifmik shkala</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="countryBadges" class="flex flex-wrap gap-2 pt-2"></div>
+                <div id="compareTimelineChart" style="height: 480px;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 6: DATA TABLE -->
+        <section id="dataTab" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white">2026 To'liq Demografik Ma'lumotlar To'plami (234 Davlat)</h3>
+                    <span id="rowCountLabel" class="text-xs text-slate-400">234 ta davlat</span>
+                </div>
+                <div class="overflow-x-auto max-h-[550px] border border-borderCol/60 rounded-xl">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider sticky top-0 border-b border-borderCol">
+                            <tr>
+                                <th class="p-3">Rank</th>
+                                <th class="p-3">Davlat</th>
+                                <th class="p-3">Qit'a</th>
+                                <th class="p-3">2026 Aholi</th>
+                                <th class="p-3">2022 Aholi</th>
+                                <th class="p-3">1970 Aholi</th>
+                                <th class="p-3">Maydon (km²)</th>
+                                <th class="p-3">Zichlik</th>
+                                <th class="p-3">O'sish %</th>
+                                <th class="p-3">TFR</th>
+                                <th class="p-3">Umr ko'rish</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="divide-y divide-borderCol/40">
+                            <!-- JS orqali to'ldiriladi -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-borderCol/60 py-8 bg-darkBg text-center text-xs text-slate-500 space-y-2">
+        <p>Dunyo Aholisi O'sishi va Demografik Tahlil Platformasi • 2026 Ma'lumotlar To'plami</p>
+        <p>Manbalar: United Nations DESA • World Bank Open Data • Kaggle Grandmaster Hasib Al Muzdadid</p>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        let rawData = [];
+        let filteredData = [];
+        let currentContinent = 'All';
+        let searchQuery = '';
+        let selectedCountries = ["Uzbekistan", "India", "China", "United States", "Turkey", "Germany"];
+
+        const CONTINENT_COLORS = {
+            "Asia": "#E76F51",
+            "Africa": "#2A9D8F",
+            "Europe": "#457B9D",
+            "North America": "#E9C46A",
+            "South America": "#F4A261",
+            "Oceania": "#264653"
+        };
+
+        // Yuklash
+        async function loadData() {
+            try {
+                const res = await fetch('data/world_population_2026.json');
+                rawData = await res.json();
+                applyFilters();
+                initApp();
+            } catch (err) {
+                console.error("Xatolik:", err);
+            }
+        }
+
+        function initApp() {
+            renderChoropleth();
+            renderContinentCharts();
+            renderDensityCharts();
+            renderGrowthChart();
+            renderDemoChart();
+            renderComparisonBadges();
+            renderComparisonTimeline();
+            renderTable();
+        }
+
+        function applyFilters() {
+            filteredData = rawData.filter(item => {
+                const matchContinent = currentContinent === 'All' || item.Continent === currentContinent;
+                const matchSearch = !searchQuery || item['Country/Territory'].toLowerCase().includes(searchQuery.toLowerCase());
+                return matchContinent && matchSearch;
+            });
+        }
+
+        function filterContinent(cont) {
+            currentContinent = cont;
+            document.querySelectorAll('#continentFilterBtns button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            applyFilters();
+            renderChoropleth();
+            renderDensityCharts();
+            renderGrowthChart();
+            renderDemoChart();
+            renderTable();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim();
+            applyFilters();
+            renderChoropleth();
+            renderTable();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(b => {
+                b.classList.remove('bg-blue-600', 'text-white');
+                b.classList.add('text-slate-300');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-blue-600', 'text-white');
+            activeBtn.classList.remove('text-slate-300');
+
+            // Plotly qayta o'lchash
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        // 1. CHOROPLETH XARITA
+        function renderChoropleth() {
+            const metric = document.getElementById('mapMetricSelect').value;
+            const proj = document.getElementById('mapProjSelect').value;
+
+            const locations = filteredData.map(d => d.CCA3);
+            const zValues = filteredData.map(d => d[metric]);
+            const textHover = filteredData.map(d => 
+                `<b>${d['Country/Territory']}</b><br>` +
+                `Qit'a: ${d.Continent}<br>` +
+                `2026 Aholi: ${Number(d['2026 Population']).toLocaleString()}<br>` +
+                `Zichlik: ${d['2026 Density (per km²)']} kishi/km²<br>` +
+                `O'sish: ${d['2026 Annual Growth %']}%/yil<br>` +
+                `TFR: ${d['Fertility Rate']} | Umr: ${d['Life Expectancy']} yil`
+            );
+
+            let colorScale = 'Plasma';
+            if (metric.includes('Growth')) colorScale = 'RdYlGn';
+            else if (metric.includes('Density')) colorScale = 'Viridis';
+            else if (metric.includes('Fertility')) colorScale = 'YlOrRd';
+            else if (metric.includes('Life')) colorScale = 'Teal';
+
+            const plotData = [{
+                type: 'choropleth',
+                locations: locations,
+                z: zValues,
+                hoverinfo: 'text',
+                text: textHover,
+                colorscale: colorScale,
+                marker: { line: { color: '#1e293b', width: 0.5 } },
+                colorbar: {
+                    title: { text: metric, font: { color: '#94a3b8', size: 11 } },
+                    tickfont: { color: '#94a3b8', size: 10 },
+                    len: 0.6,
+                    thickness: 12
+                }
+            }];
+
+            const layout = {
+                geo: {
+                    projection: { type: proj },
+                    showocean: true, oceancolor: '#0b0f19',
+                    showland: true, landcolor: '#1e293b',
+                    showcoastlines: true, coastlinecolor: '#334155',
+                    bgcolor: 'rgba(0,0,0,0)',
+                    showframe: false
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { l: 0, r: 0, t: 10, b: 0 }
+            };
+
+            Plotly.newPlot('choroplethChart', plotData, layout, { responsive: true, displayModeBar: false });
+        }
+
+        // 2. QIT'ALAR DONUT VA O'SISH
+        function renderContinentCharts() {
+            const contMap = {};
+            const growthMap = {};
+
+            rawData.forEach(d => {
+                contMap[d.Continent] = (contMap[d.Continent] || 0) + Number(d['2026 Population']);
+                if (!growthMap[d.Continent]) growthMap[d.Continent] = [];
+                growthMap[d.Continent].push(Number(d['2026 Annual Growth %']));
+            });
+
+            const continents = Object.keys(contMap);
+            const populations = continents.map(c => contMap[c]);
+            const avgGrowths = continents.map(c => {
+                const arr = growthMap[c];
+                return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
+            });
+            const colors = continents.map(c => CONTINENT_COLORS[c] || '#94a3b8');
+
+            // Donut
+            Plotly.newPlot('continentPieChart', [{
+                type: 'pie',
+                labels: continents,
+                values: populations,
+                hole: 0.45,
+                marker: { colors: colors },
+                textinfo: 'percent+label',
+                hoverinfo: 'label+value+percent'
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#cbd5e1', size: 11 },
+                margin: { l: 20, r: 20, t: 10, b: 10 },
+                showlegend: false
+            }, { responsive: true, displayModeBar: false });
+
+            // Bar chart
+            Plotly.newPlot('continentGrowthChart', [{
+                type: 'bar',
+                x: continents,
+                y: avgGrowths,
+                marker: { color: colors },
+                text: avgGrowths.map(v => v + '%'),
+                textposition: 'outside'
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 11 },
+                yaxis: { gridcolor: '#1e293b', title: "O'rtacha o'sish (%)" },
+                xaxis: { gridcolor: '#1e293b' },
+                margin: { l: 40, r: 20, t: 20, b: 40 }
+            }, { responsive: true, displayModeBar: false });
+        }
+
+        // 3. ZICHLIK GRAFIKLARI
+        function renderDensityCharts() {
+            const sorted = [...filteredData].sort((a, b) => Number(b['2026 Density (per km²)']) - Number(a['2026 Density (per km²)']));
+            const top15 = sorted.slice(0, 15).reverse();
+            const low15 = sorted.slice(-15);
+
+            Plotly.newPlot('topDensityChart', [{
+                type: 'bar',
+                x: top15.map(d => Number(d['2026 Density (per km²)'])),
+                y: top15.map(d => d['Country/Territory']),
+                orientation: 'h',
+                marker: { color: top15.map(d => CONTINENT_COLORS[d.Continent] || '#3b82f6') },
+                text: top15.map(d => Number(d['2026 Density (per km²)']).toFixed(1)),
+                textposition: 'outside'
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 10 },
+                xaxis: { gridcolor: '#1e293b' },
+                yaxis: { gridcolor: '#1e293b' },
+                margin: { l: 110, r: 50, t: 10, b: 30 }
+            }, { responsive: true, displayModeBar: false });
+
+            Plotly.newPlot('lowDensityChart', [{
+                type: 'bar',
+                x: low15.map(d => Number(d['2026 Density (per km²)'])),
+                y: low15.map(d => d['Country/Territory']),
+                orientation: 'h',
+                marker: { color: low15.map(d => CONTINENT_COLORS[d.Continent] || '#10b981') },
+                text: low15.map(d => Number(d['2026 Density (per km²)']).toFixed(2)),
+                textposition: 'outside'
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 10 },
+                xaxis: { gridcolor: '#1e293b' },
+                yaxis: { gridcolor: '#1e293b' },
+                margin: { l: 110, r: 50, t: 10, b: 30 }
+            }, { responsive: true, displayModeBar: false });
+
+            // Scatter Area vs Density
+            Plotly.newPlot('densityAreaScatter', [{
+                type: 'scatter',
+                mode: 'markers',
+                x: filteredData.map(d => Number(d['Area (km²)'])),
+                y: filteredData.map(d => Number(d['2026 Density (per km²)'])),
+                text: filteredData.map(d => `${d['Country/Territory']} (Aholi: ${Number(d['2026 Population']).toLocaleString()})`),
+                marker: {
+                    size: filteredData.map(d => Math.max(6, Math.min(45, Math.sqrt(Number(d['2026 Population'])) / 1400))),
+                    color: filteredData.map(d => CONTINENT_COLORS[d.Continent] || '#3b82f6'),
+                    opacity: 0.8,
+                    line: { color: '#ffffff', width: 0.5 }
+                }
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 11 },
+                xaxis: { type: 'log', title: 'Maydoni (km², log)', gridcolor: '#1e293b' },
+                yaxis: { type: 'log', title: 'Zichligi (kishi/km², log)', gridcolor: '#1e293b' },
+                margin: { l: 50, r: 20, t: 20, b: 50 }
+            }, { responsive: true, displayModeBar: false });
+        }
+
+        // 4. O'SISH SUR'ATLARI
+        function renderGrowthChart() {
+            const sorted = [...filteredData].sort((a, b) => Number(b['2026 Annual Growth %']) - Number(a['2026 Annual Growth %']));
+            const topGrow = sorted.slice(0, 10);
+            const topDecl = sorted.slice(-10);
+            const combined = [...topDecl, ...topGrow];
+
+            Plotly.newPlot('growthRateChart', [{
+                type: 'bar',
+                x: combined.map(d => Number(d['2026 Annual Growth %'])),
+                y: combined.map(d => d['Country/Territory']),
+                orientation: 'h',
+                marker: { color: combined.map(d => Number(d['2026 Annual Growth %']) < 0 ? '#ef4444' : '#10b981') },
+                text: combined.map(d => (Number(d['2026 Annual Growth %']) > 0 ? '+' : '') + Number(d['2026 Annual Growth %']).toFixed(2) + '%'),
+                textposition: 'outside'
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 11 },
+                xaxis: { title: "Yillik o'sish sur'ati (%)", gridcolor: '#1e293b' },
+                yaxis: { gridcolor: '#1e293b' },
+                margin: { l: 120, r: 60, t: 20, b: 40 }
+            }, { responsive: true, displayModeBar: false });
+        }
+
+        // 5. DEMOGRAFIYA SCATTER
+        function renderDemoChart() {
+            Plotly.newPlot('demoScatterChart', [{
+                type: 'scatter',
+                mode: 'markers',
+                x: filteredData.map(d => Number(d['Fertility Rate'])),
+                y: filteredData.map(d => Number(d['Life Expectancy'])),
+                text: filteredData.map(d => `<b>${d['Country/Territory']}</b><br>TFR: ${d['Fertility Rate']}<br>Umr: ${d['Life Expectancy']} yil<br>O'rtacha yosh: ${d['Median Age']}`),
+                marker: {
+                    size: filteredData.map(d => Math.max(6, Math.min(45, Math.sqrt(Number(d['2026 Population'])) / 1400))),
+                    color: filteredData.map(d => CONTINENT_COLORS[d.Continent] || '#3b82f6'),
+                    opacity: 0.8
+                }
+            }], {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 11 },
+                xaxis: { title: "Tug'ilish koeffitsienti (TFR - har bir ayolga to'g'ri keluvchi bola)", gridcolor: '#1e293b' },
+                yaxis: { title: "O'rtacha umr ko'rish (yil)", gridcolor: '#1e293b' },
+                shapes: [{
+                    type: 'line',
+                    x0: 2.1, x1: 2.1,
+                    y0: 50, y1: 90,
+                    line: { color: '#f59e0b', width: 2, dash: 'dot' }
+                }],
+                annotations: [{
+                    x: 2.15, y: 88,
+                    text: "Almashinuv me'yori (2.1)",
+                    showarrow: false,
+                    font: { color: '#f59e0b', size: 11 }
+                }],
+                margin: { l: 50, r: 20, t: 20, b: 50 }
+            }, { responsive: true, displayModeBar: false });
+        }
+
+        // 6. TAQQOSLASH (TIMELINE)
+        function renderComparisonBadges() {
+            const container = document.getElementById('countryBadges');
+            container.innerHTML = '';
+            
+            // Default va mashhur davlatlar
+            const popular = ["Uzbekistan", "India", "China", "United States", "Turkey", "Germany", "Japan", "Kazakhstan", "Russia", "Brazil"];
+            popular.forEach(c => {
+                const isSelected = selectedCountries.includes(c);
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                    isSelected ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                }`;
+                btn.innerText = c;
+                btn.onclick = () => {
+                    if (selectedCountries.includes(c)) {
+                        if (selectedCountries.length > 1) {
+                            selectedCountries = selectedCountries.filter(x => x !== c);
+                        }
+                    } else {
+                        selectedCountries.push(c);
+                    }
+                    renderComparisonBadges();
+                    renderComparisonTimeline();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderComparisonTimeline() {
+            const isLog = document.getElementById('logScaleToggle').checked;
+            const years = [1970, 1980, 1990, 2000, 2010, 2015, 2020, 2022, 2024, 2026];
+
+            const traces = selectedCountries.map(cName => {
+                const row = rawData.find(d => d['Country/Territory'] === cName);
+                if (!row) return null;
+                const popValues = years.map(yr => Number(row[`${yr} Population`]));
+
+                return {
+                    x: years,
+                    y: popValues,
+                    name: cName,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: { width: 3 },
+                    marker: { size: 6 }
+                };
+            }).filter(Boolean);
+
+            Plotly.newPlot('compareTimelineChart', traces, {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(19, 27, 46, 0.4)',
+                font: { color: '#cbd5e1', size: 11 },
+                xaxis: { title: 'Yil', gridcolor: '#1e293b', dtick: 10 },
+                yaxis: { title: 'Aholi soni', gridcolor: '#1e293b', type: isLog ? 'log' : 'linear' },
+                legend: { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center' },
+                margin: { l: 70, r: 20, t: 30, b: 40 }
+            }, { responsive: true, displayModeBar: false });
+        }
+
+        // 7. MA'LUMOTLAR JADVALI
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('rowCountLabel').innerText = `${filteredData.length} ta davlat`;
+
+            filteredData.slice(0, 100).forEach(d => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition border-b border-borderCol/30';
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-400">#${d['2026 Rank']}</td>
+                    <td class="p-3 font-semibold text-white">${d['Country/Territory']}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300">${d.Continent}</span></td>
+                    <td class="p-3 font-bold text-emerald-400">${Number(d['2026 Population']).toLocaleString()}</td>
+                    <td class="p-3 text-slate-400">${Number(d['2022 Population']).toLocaleString()}</td>
+                    <td class="p-3 text-slate-400">${Number(d['1970 Population']).toLocaleString()}</td>
+                    <td class="p-3 text-slate-400">${Number(d['Area (km²)']).toLocaleString()}</td>
+                    <td class="p-3 text-blue-400">${d['2026 Density (per km²)']}</td>
+                    <td class="p-3 ${Number(d['2026 Annual Growth %']) < 0 ? 'text-red-400' : 'text-emerald-400'}">${d['2026 Annual Growth %']}%</td>
+                    <td class="p-3 text-amber-400">${d['Fertility Rate']}</td>
+                    <td class="p-3 text-cyan-400">${d['Life Expectancy']} y</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function downloadCSV() {
+            window.location.href = 'data/world_population_2026.csv';
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
