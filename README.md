@@ -1,6 +1,7 @@
 # 🌍 Dunyo Aholisi 2026 & Demografik Tahlil (World Population Analysis 1970 - 2026)
 
 [![Vercel Live](https://img.shields.io/badge/Vercel-Live%20Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://world-population-analysis.vercel.app)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://qodirovtoirbektts-jpg.github.io/world-population-analysis/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/qodirovtoirbektts-jpg/world-population-analysis)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.67+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
